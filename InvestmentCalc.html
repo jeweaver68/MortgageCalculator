@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>15yr vs 30yr Mortgage & Invest Comparator</title>
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#121820; --muted:#8aa0b2; --ink:#e8eef4; --accent:#7cc4ff; --good:#39d98a; --bad:#ff8a7f;
+    }
+    html,body{height:100%}
+    body{margin:0; font:14px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink)}
+    h1{font-size:20px; margin:12px 0 8px}
+    h2{font-size:16px; margin:16px 0 8px; color:var(--accent)}
+    .wrap{max-width:1100px; margin:0 auto; padding:20px}
+    .grid{display:grid; gap:12px}
+    .cols{grid-template-columns: repeat(auto-fit, minmax(260px,1fr))}
+    .card{background:var(--card); border:1px solid #1e2630; border-radius:14px; padding:14px; box-shadow:0 1px 0 #00000055}
+    label{display:grid; gap:4px; margin:6px 0}
+    label span{color:var(--muted); font-size:12px}
+    input[type="number"], input[type="text"]{background:#0e141b; color:var(--ink); border:1px solid #263241; border-radius:10px; padding:10px; width:100%}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .btn{padding:10px 14px; background:#1f2a36; border:1px solid #2a3a4d; border-radius:10px; color:var(--ink); cursor:pointer}
+    .btn.primary{background:#0f62fe20; border-color:#0f62fe60}
+    .btn:disabled{opacity:.6; cursor:not-allowed}
+    .note{font-size:12px; color:var(--muted)}
+    .kpi{display:grid; gap:6px}
+    .kpi .n{font-size:18px}
+    .good{color:var(--good)}
+    .bad{color:var(--bad)}
+    details{border-top:1px dashed #2a3a4d; padding-top:10px; margin-top:10px}
+    table{width:100%; border-collapse:collapse; font-size:12px}
+    th,td{padding:6px 8px; border-bottom:1px solid #243244}
+    th{color:var(--muted); text-align:left}
+    tfoot td{font-weight:600}
+    .winner{background:#11301f; border:1px solid #1f6342}
+    .loser{background:#301a1a; border:1px solid #5f2a2a}
+    .slider-container{display:grid; gap:8px; margin:8px 0}
+    .slider-row{display:flex; align-items:center; gap:10px}
+    .slider{flex:1; height:6px; border-radius:3px; background:#263241; outline:none; opacity:0.7; transition:opacity 0.2s}
+    .slider:hover{opacity:1}
+    .slider::-webkit-slider-thumb{appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer}
+    .slider::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; border:none}
+    .value-display{min-width:80px; text-align:right; font-family:monospace; color:var(--accent)}
+    .breakeven{background:#1a2332; border:1px solid #2a3a4d; border-radius:10px; padding:12px; margin:10px 0}
+    .breakeven h3{margin:0 0 8px; color:var(--accent); font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Advanced Mortgage vs Investment Calculator</h1>
+    <p class="note">Compare loan terms with tax considerations, PMI, and investment strategies. Annual compounding for investments, monthly for mortgage interest.</p>
+
+    <div class="grid cols">
+      <div class="card">
+        <h2>Basic Parameters</h2>
+        
+        <div class="slider-container">
+          <label><span>Home Price</span></label>
+          <div class="slider-row">
+            <input type="range" id="homePriceSlider" class="slider" min="50000" max="1000000" step="10000" value="350000">
+            <div class="value-display" id="homePriceDisplay">$350,000</div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <label><span>Down Payment (%)</span></label>
+          <div class="slider-row">
+            <input type="range" id="downPaymentSlider" class="slider" min="0" max="25" step="1" value="10">
+            <div class="value-display" id="downPaymentDisplay">10%</div>
+          </div>
+        </div>
+
+        <div class="grid cols">
+          <div class="slider-container">
+            <label><span>15-yr Rate (%)</span></label>
+            <div class="slider-row">
+              <input type="range" id="rate15Slider" class="slider" min="3" max="8" step="0.125" value="5.25">
+              <div class="value-display" id="rate15Display">5.25%</div>
+            </div>
+          </div>
+          <div class="slider-container">
+            <label><span>30-yr Rate (%)</span></label>
+            <div class="slider-row">
+              <input type="range" id="rate30Slider" class="slider" min="3" max="8" step="0.125" value="6.00">
+              <div class="value-display" id="rate30Display">6.00%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <label><span>Monthly Budget (Housing + Investing)</span></label>
+          <div class="slider-row">
+            <input type="range" id="budgetSlider" class="slider" min="1000" max="10000" step="100" value="3500">
+            <div class="value-display" id="budgetDisplay">$3,500</div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <label><span>Analysis Period (Years)</span></label>
+          <div class="slider-row">
+            <input type="range" id="yearsSlider" class="slider" min="15" max="40" step="1" value="30">
+            <div class="value-display" id="yearsDisplay">30</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Investment & Tax Settings</h2>
+        
+        <div class="slider-container">
+          <label><span>Investment Annual Return (%)</span></label>
+          <div class="slider-row">
+            <input type="range" id="roiSlider" class="slider" min="3" max="12" step="0.25" value="7.00">
+            <div class="value-display" id="roiDisplay">7.00%</div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <label><span>Marginal Tax Rate (%)</span></label>
+          <div class="slider-row">
+            <input type="range" id="taxRateSlider" class="slider" min="12" max="37" step="1" value="22">
+            <div class="value-display" id="taxRateDisplay">22%</div>
+          </div>
+        </div>
+
+        <div class="slider-container">
+          <label><span>Capital Gains Tax Rate (%)</span></label>
+          <div class="slider-row">
+            <input type="range" id="capGainsSlider" class="slider" min="0" max="20" step="1" value="15">
+            <div class="value-display" id="capGainsDisplay">15%</div>
+          </div>
+        </div>
+
+        <label>
+          <span>PMI Rate (% annually, if down payment < 20%)</span>
+          <input id="pmiRate" type="number" min="0" step="0.1" value="0.5" />
+        </label>
+
+        <label>
+          <span>Extra payment on 30yr mortgage (optional)</span>
+          <input id="extra2" type="number" min="0" step="10" value="0" />
+        </label>
+
+        <label class="toggle">
+          <input id="countRemainingBalance" type="checkbox" />
+          <span>Subtract remaining loan balance at end (treat as liability)</span>
+        </label>
+
+        <div class="row" style="margin-top:10px">
+          <button id="run" class="btn primary">Run Analysis</button>
+          <button id="dumpCsv" class="btn">Export Data (CSV)</button>
+        </div>
+      </div>
+
+      <div id="summary" class="card">
+        <h2>Results Summary</h2>
+        <div class="grid cols">
+          <div class="kpi" id="kpi1">
+            <div><span class="pill">Scenario 1 — 15yr loan</span></div>
+            <div class="n">—</div>
+            <div class="note" id="kpi1note"></div>
+          </div>
+          <div class="kpi" id="kpi2">
+            <div><span class="pill">Scenario 2 — 30yr loan + invest diff</span></div>
+            <div class="n">—</div>
+            <div class="note" id="kpi2note"></div>
+          </div>
+        </div>
+        <div id="winner" class="note" style="margin-top:10px"></div>
+        
+        <div class="breakeven">
+          <h3>Break-Even Analysis</h3>
+          <div id="breakevenContent">Run analysis to see break-even points...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols" style="margin-top:12px">
+      <div class="card" id="s1card">
+        <h2>Scenario 1: 15-year loan + invest leftover budget</h2>
+        <div id="s1"></div>
+      </div>
+      <div class="card" id="s2card">
+        <h2>Scenario 2: 30-year loan + invest leftover budget</h2>
+        <div id="s2"></div>
+      </div>
+        <div id="s2"></div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  // Slider handling
+  function setupSliders(){
+    const sliders = [
+      {id: 'homePriceSlider', display: 'homePriceDisplay', format: (v) => `$${(+v).toLocaleString()}`},
+      {id: 'downPaymentSlider', display: 'downPaymentDisplay', format: (v) => `${v}%`},
+      {id: 'rate15Slider', display: 'rate15Display', format: (v) => `${v}%`},
+      {id: 'rate30Slider', display: 'rate30Display', format: (v) => `${v}%`},
+      {id: 'budgetSlider', display: 'budgetDisplay', format: (v) => `$${(+v).toLocaleString()}`},
+      {id: 'yearsSlider', display: 'yearsDisplay', format: (v) => `${v}`},
+      {id: 'roiSlider', display: 'roiDisplay', format: (v) => `${v}%`},
+      {id: 'taxRateSlider', display: 'taxRateDisplay', format: (v) => `${v}%`},
+      {id: 'capGainsSlider', display: 'capGainsDisplay', format: (v) => `${v}%`}
+    ];
+
+    sliders.forEach(({id, display, format}) => {
+      const slider = document.getElementById(id);
+      const displayEl = document.getElementById(display);
+      
+      slider.addEventListener('input', () => {
+        displayEl.textContent = format(slider.value);
+        run(); // Auto-update on slider change
+      });
+      
+      // Initialize display
+      displayEl.textContent = format(slider.value);
+    });
+  }
+
+  function fmt(n){
+    return n.toLocaleString(undefined,{maximumFractionDigits:2, minimumFractionDigits:2});
+  }
+
+  function payment(principal, periodicRate, termMonths){
+    const r = periodicRate;
+    if (r === 0) return principal / termMonths;
+    return principal * r / (1 - Math.pow(1 + r, -termMonths));
+  }
+
+  function calculatePMI(homePrice, downPaymentPct, pmiRate){
+    const downPayment = homePrice * (downPaymentPct / 100);
+    const loanAmount = homePrice - downPayment;
+    
+    if(downPaymentPct >= 20) return 0; // No PMI if 20%+ down
+    
+    return (loanAmount * (pmiRate / 100)) / 12; // Monthly PMI
+  }
+
+  function calculateTaxSavings(interestPaid, marginalTaxRate){
+    return interestPaid * (marginalTaxRate / 100);
+  }
+
+  function amortize(principal, aprPct, extra, horizonMonths, maxTermMonths, pmiMonthly, marginalTaxRate){
+    const r = (aprPct/100)/12;
+    const basePmt = payment(principal, r, maxTermMonths);
+    let bal = principal;
+    let totalPaid = 0;
+    let totalInterest = 0;
+    let totalTaxSavings = 0;
+    let totalPMI = 0;
+    const rows=[];
+    let payoffMonth = null;
+    
+    for(let m=1; m<=horizonMonths; m++){
+      if (bal<=1e-6){
+        rows.push({m, pmt:0, interest:0, principal:0, extraPaid:0, bal:0, pmi:0, taxSavings:0});
+        continue;
+      }
+      
+      const interest = bal * r;
+      let princ = basePmt - interest;
+      let curExtra = extra;
+      
+      if (princ + curExtra > bal){
+        const over = princ + curExtra - bal;
+        if (curExtra >= over){ curExtra -= over; }
+        else { princ -= (over - curExtra); curExtra = 0; }
+      }
+      
+      const pmt = Math.max(0, princ + interest);
+      const pmi = pmiMonthly; // PMI continues until 20% equity or payoff
+      const taxSavings = calculateTaxSavings(interest, marginalTaxRate);
+      
+      bal = Math.max(0, bal - princ - curExtra);
+      totalPaid += pmt + curExtra + pmi;
+      totalInterest += interest;
+      totalTaxSavings += taxSavings;
+      totalPMI += pmi;
+      
+      rows.push({m, pmt:pmt+curExtra, interest, principal:princ, extraPaid:curExtra, bal, pmi, taxSavings});
+      if (bal<=1e-6 && payoffMonth===null) payoffMonth = m;
+    }
+    
+    return {schedule:rows, totalPaid, totalInterest, totalTaxSavings, totalPMI, payoffMonth, remainingBalance:bal, basePmt};
+  }
+
+  function investFlowWithTaxes(contribs, annualPct, capGainsRate){
+    const annualRate = annualPct/100;
+    let fv = 0;
+    
+    for(let month = 0; month < contribs.length; month++){
+      const contrib = contribs[month];
+      const yearsRemaining = (contribs.length - month) / 12;
+      const futureValue = contrib * Math.pow(1 + annualRate, yearsRemaining);
+      fv += futureValue;
+    }
+    
+    // Calculate taxes on gains
+    const totalContribs = contribs.reduce((a,b) => a+b, 0);
+    const totalGains = Math.max(0, fv - totalContribs);
+    const taxOnGains = totalGains * (capGainsRate / 100);
+    
+    return {
+      futureValue: fv,
+      totalContributions: totalContribs,
+      totalGains: totalGains,
+      taxOnGains: taxOnGains,
+      afterTaxValue: fv - taxOnGains
+    };
+  }
+
+  function attachInvestmentToSchedule(schedule, contribs, annualPct){
+    const annualRate = annualPct/100;
+    const totalMonths = contribs.length;
+    const invBal = [];
+    
+    for (let month = 0; month < totalMonths; month++){
+      let balanceAtThisMonth = 0;
+      
+      for(let prevMonth = 0; prevMonth <= month; prevMonth++){
+        const contrib = contribs[prevMonth] || 0;
+        const yearsFromContribToCurrentMonth = (month - prevMonth + 1) / 12;
+        balanceAtThisMonth += contrib * Math.pow(1 + annualRate, yearsFromContribToCurrentMonth);
+      }
+      
+      invBal.push(balanceAtThisMonth);
+    }
+    
+    for (let i = 0; i < schedule.length; i++){
+      schedule[i].invContrib = contribs[i] || 0;
+      schedule[i].invBal = invBal[i] || 0;
+    }
+  }
+
+  function buildScenario1(homePrice, downPaymentPct, rate15, roi, years, totalBudget, pmiRate, marginalTaxRate, capGainsRate, countRemaining){
+    const downPayment = homePrice * (downPaymentPct / 100);
+    const principal = homePrice - downPayment;
+    const horizon = years * 12;
+    const maxTerm = 15 * 12;
+    const pmiMonthly = calculatePMI(homePrice, downPaymentPct, pmiRate);
+    
+    const {schedule, totalPaid, totalInterest, totalTaxSavings, totalPMI, payoffMonth, remainingBalance, basePmt} = 
+      amortize(principal, rate15, 0, horizon, maxTerm, pmiMonthly, marginalTaxRate);
+
+    // Check if payments exceed budget
+    const totalMonthlyPayment = basePmt + pmiMonthly;
+    if(totalMonthlyPayment > totalBudget){
+      return {
+        label:"Scenario 1 — 15yr loan + invest leftover",
+        error: `15-year payment + PMI ($${fmt(totalMonthlyPayment)}) exceeds budget ($${fmt(totalBudget)})`,
+        basePmt, payoffMonth: null, totalPaid: 0, remainingBalance: principal, 
+        afterTaxInvestValue: 0, net: 0, totalBudget, downPayment,
+        monthlyInvestmentWhilePaying: 0, monthlyInvestmentAfterPayoff: 0,
+        schedule: []
+      };
+    }
+
+    // Investment contributions
+    const contribs = new Array(horizon).fill(0);
+    for(let m = 0; m < horizon; m++){
+      if(m < schedule.length && schedule[m].pmt > 0){
+        const mortgageAndPMI = schedule[m].pmt + schedule[m].pmi;
+        contribs[m] = Math.max(0, totalBudget - mortgageAndPMI);
+      } else {
+        contribs[m] = totalBudget;
+      }
+    }
+    
+    const investmentResult = investFlowWithTaxes(contribs, roi, capGainsRate);
+    attachInvestmentToSchedule(schedule, contribs, roi);
+
+    const homeValue = homePrice;
+    const liability = countRemaining ? remainingBalance : 0;
+    const effectiveCost = totalPaid + totalPMI - totalTaxSavings;
+    const net = homeValue + investmentResult.afterTaxValue - effectiveCost - liability - downPayment;
+
+    return {
+      label:"Scenario 1 — 15yr loan + invest leftover",
+      basePmt, payoffMonth, totalPaid, remainingBalance, 
+      afterTaxInvestValue: investmentResult.afterTaxValue,
+      totalTaxSavings, totalPMI, effectiveCost, net, totalBudget, downPayment,
+      monthlyInvestmentWhilePaying: payoffMonth ? Math.max(0, totalBudget - basePmt - pmiMonthly) : Math.max(0, totalBudget - basePmt - pmiMonthly),
+      monthlyInvestmentAfterPayoff: payoffMonth ? totalBudget : 0,
+      investmentResult,
+      schedule
+    };
+  }
+
+  function buildScenario2(homePrice, downPaymentPct, rate30, roi, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining){
+    const downPayment = homePrice * (downPaymentPct / 100);
+    const principal = homePrice - downPayment;
+    const horizon = years * 12;
+    const term30 = 30 * 12;
+    const pmiMonthly = calculatePMI(homePrice, downPaymentPct, pmiRate);
+    
+    const {schedule, totalPaid, totalInterest, totalTaxSavings, totalPMI, payoffMonth, remainingBalance, basePmt} = 
+      amortize(principal, rate30, extra2, horizon, term30, pmiMonthly, marginalTaxRate);
+
+    // Check if payments exceed budget
+    const totalMonthlyPayment = basePmt + extra2 + pmiMonthly;
+    if(totalMonthlyPayment > totalBudget){
+      return {
+        label:"Scenario 2 — 30yr loan + invest leftover",
+        error: `30-year payment + extra + PMI ($${fmt(totalMonthlyPayment)}) exceeds budget ($${fmt(totalBudget)})`,
+        basePmt: basePmt, payoffMonth: null, totalPaid: 0, remainingBalance: principal, 
+        afterTaxInvestValue: 0, net: 0, totalBudget, downPayment, extra2,
+        monthlyInvestmentWhilePaying: 0, monthlyInvestmentAfterPayoff: 0,
+        schedule: []
+      };
+    }
+
+    // Investment contributions
+    const contribs = new Array(horizon).fill(0);
+    for(let m = 0; m < horizon; m++){
+      if(m < schedule.length && schedule[m].pmt > 0){
+        const mortgageAndPMI = schedule[m].pmt + schedule[m].pmi;
+        contribs[m] = Math.max(0, totalBudget - mortgageAndPMI);
+      } else {
+        contribs[m] = totalBudget;
+      }
+    }
+    
+    const investmentResult = investFlowWithTaxes(contribs, roi, capGainsRate);
+    attachInvestmentToSchedule(schedule, contribs, roi);
+
+    const homeValue = homePrice;
+    const liability = countRemaining ? remainingBalance : 0;
+    const effectiveCost = totalPaid + totalPMI - totalTaxSavings;
+    const net = homeValue + investmentResult.afterTaxValue - effectiveCost - liability - downPayment;
+
+    return {
+      label:"Scenario 2 — 30yr loan + invest leftover",
+      basePmt: basePmt, payoffMonth, totalPaid, remainingBalance, 
+      afterTaxInvestValue: investmentResult.afterTaxValue,
+      totalTaxSavings, totalPMI, effectiveCost, net, totalBudget, downPayment, extra2,
+      monthlyInvestmentWhilePaying: payoffMonth ? Math.max(0, totalBudget - basePmt - extra2 - pmiMonthly) : Math.max(0, totalBudget - basePmt - extra2 - pmiMonthly),
+      monthlyInvestmentAfterPayoff: payoffMonth ? totalBudget : 0,
+      investmentResult,
+      schedule
+    };
+  }
+
+  function calculateBreakEven(homePrice, downPaymentPct, rate15, rate30, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining){
+    // Find the investment return rate where both scenarios are equal
+    // Logic: Higher investment returns favor the 30-year strategy (more money to invest)
+    //        Lower investment returns favor the 15-year strategy (pay off debt faster)
+    
+    let lowROI = 0;
+    let highROI = 30;
+    let iterations = 0;
+    const tolerance = 0.001;
+    
+    // First, check if there's actually a break-even point in our range
+    const testLow = buildScenario1(homePrice, downPaymentPct, rate15, lowROI, years, totalBudget, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+    const testLow2 = buildScenario2(homePrice, downPaymentPct, rate30, lowROI, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+    
+    const testHigh = buildScenario1(homePrice, downPaymentPct, rate15, highROI, years, totalBudget, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+    const testHigh2 = buildScenario2(homePrice, downPaymentPct, rate30, highROI, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+    
+    if(testLow.error || testLow2.error || testHigh.error || testHigh2.error) {
+      return null; // Can't calculate break-even with budget errors
+    }
+    
+    const diffLow = testLow.net - testLow2.net;
+    const diffHigh = testHigh.net - testHigh2.net;
+    
+    // Check if both scenarios favor the same strategy across the entire range
+    if((diffLow > 0 && diffHigh > 0) || (diffLow < 0 && diffHigh < 0)) {
+      return null; // No break-even point in this range
+    }
+    
+    // Binary search for break-even point
+    while(iterations < 100 && (highROI - lowROI) > tolerance){
+      const midROI = (lowROI + highROI) / 2;
+      
+      const s1 = buildScenario1(homePrice, downPaymentPct, rate15, midROI, years, totalBudget, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+      const s2 = buildScenario2(homePrice, downPaymentPct, rate30, midROI, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+      
+      if(s1.error || s2.error) break;
+      
+      const diff = s1.net - s2.net;
+      
+      if(Math.abs(diff) < 100) return midROI; // Close enough (within $100)
+      
+      if(diff > 0){
+        // 15-year is better at this ROI, so break-even is at higher ROI
+        lowROI = midROI;
+      } else {
+        // 30-year is better at this ROI, so break-even is at lower ROI  
+        highROI = midROI;
+      }
+      
+      iterations++;
+    }
+    
+    return (lowROI + highROI) / 2;
+  }
+
+  function renderScenario(container, res){
+    if(res.error){
+      container.innerHTML = `
+        <div style="color: var(--bad); padding: 20px; text-align: center;">
+          <div style="font-size: 16px; margin-bottom: 10px;">⚠️ Budget Exceeded</div>
+          <div>${res.error}</div>
+          <div style="margin-top: 10px; font-size: 12px;">Increase budget or adjust loan parameters.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const payoffTxt = res.payoffMonth ? `${res.payoffMonth} months (${(res.payoffMonth/12).toFixed(2)} yrs)` : `Not paid off by horizon`;
+    
+    container.innerHTML = `
+      <div class="grid cols">
+        <div>
+          <div class="note">Monthly mortgage payment</div>
+          <div class="n">$${fmt(res.basePmt)}${res.extra2 ? ` + $${fmt(res.extra2)} extra` : ''}</div>
+        </div>
+        <div>
+          <div class="note">Down payment</div>
+          <div class="n">$${fmt(res.downPayment)}</div>
+        </div>
+        <div>
+          <div class="note">Investment years 1-${res.payoffMonth ? Math.ceil(res.payoffMonth/12) : 'end'}</div>
+          <div class="n">$${fmt(res.monthlyInvestmentWhilePaying)}/mo (${fmt(res.monthlyInvestmentWhilePaying * 12)}/yr)</div>
+        </div>
+        <div>
+          <div class="note">Investment years ${res.payoffMonth ? Math.ceil(res.payoffMonth/12) + 1 : 'N/A'}-${Math.ceil(res.schedule.length/12)}</div>
+          <div class="n">${res.monthlyInvestmentAfterPayoff > 0 ? `$${fmt(res.monthlyInvestmentAfterPayoff)}/mo (${fmt(res.monthlyInvestmentAfterPayoff * 12)}/yr)` : 'N/A'}</div>
+        </div>
+        <div>
+          <div class="note">Loan payoff</div>
+          <div class="n">${payoffTxt}</div>
+        </div>
+        <div>
+          <div class="note">Total mortgage costs</div>
+          <div class="n">$${fmt(res.effectiveCost)} (after tax savings)</div>
+        </div>
+        <div>
+          <div class="note">Investment value (after taxes)</div>
+          <div class="n">$${fmt(res.afterTaxInvestValue)}</div>
+        </div>
+        <div>
+          <div class="note">Net worth (total assets - costs)</div>
+          <div class="n">$${fmt(res.net)}</div>
+        </div>
+      </div>
+      <details>
+        <summary>Show yearly schedule & tax details</summary>
+        <div style="margin: 10px 0; font-size: 12px;">
+          <div>Total tax savings from mortgage interest: $${fmt(res.totalTaxSavings)}</div>
+          <div>Total PMI paid: $${fmt(res.totalPMI)}</div>
+          <div>Investment gains: $${fmt(res.investmentResult?.totalGains || 0)}</div>
+          <div>Tax on investment gains: $${fmt(res.investmentResult?.taxOnGains || 0)}</div>
+        </div>
+        ${tableFromSchedule(res.schedule)}
+      </details>
+    `;
+  }
+
+  function tableFromSchedule(rows){
+  let html = '<table><thead><tr>'
+    + '<th>Year</th><th>Annual Payment</th><th>Annual Interest</th><th>Annual Principal</th>'
+    + '<th>Annual Extra</th><th>Balance</th><th>Annual Invest Contrib</th><th>Invest Balance</th>'
+    + '</tr></thead><tbody>';
+  
+  // Group by years (every 12 months)
+  for(let year = 1; year <= Math.ceil(rows.length / 12); year++){
+    const startIdx = (year - 1) * 12;
+    const endIdx = Math.min(year * 12, rows.length);
+    
+    let annualPayment = 0;
+    let annualInterest = 0;
+    let annualPrincipal = 0;
+    let annualExtra = 0;
+    let annualInvestContrib = 0;
+    let yearEndBalance = 0;
+    let yearEndInvestBalance = 0;
+    
+    // Sum up the year's values
+    for(let i = startIdx; i < endIdx; i++){
+      const r = rows[i];
+      annualPayment += r.pmt;
+      annualInterest += r.interest;
+      annualPrincipal += r.principal;
+      annualExtra += r.extraPaid;
+      annualInvestContrib += r.invContrib || 0;
+    }
+    
+    // Use the last month's balances for year-end
+    if(endIdx > 0){
+      yearEndBalance = rows[endIdx - 1].bal;
+      yearEndInvestBalance = rows[endIdx - 1].invBal || 0;
+    }
+    
+    html += `<tr>
+      <td>${year}</td>
+      <td>$${fmt(annualPayment)}</td>
+      <td>$${fmt(annualInterest)}</td>
+      <td>$${fmt(annualPrincipal)}</td>
+      <td>$${fmt(annualExtra)}</td>
+      <td>$${fmt(yearEndBalance)}</td>
+      <td>$${fmt(annualInvestContrib)}</td>
+      <td>$${fmt(yearEndInvestBalance)}</td>
+    </tr>`;
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+
+  function csvFromSchedules(name, s1, s2){
+    const headers = ['Scenario','Month','Payment','Interest','Principal','Extra','Balance','InvestContrib','InvestBalance'];
+    const toLines = (label, rows)=>rows.map(r=>[
+      label, r.m, r.pmt, r.interest, r.principal, r.extraPaid, r.bal, r.invContrib||0, r.invBal||0
+    ].join(','));
+    const lines = [headers.join(',')].concat(toLines('15yr', s1.schedule), toLines('30yr', s2.schedule));
+    const blob = new Blob([lines.join('\n')], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download = `${name}.csv`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+
+  function run(){
+    // Get values from sliders and inputs
+    const homePrice = +document.getElementById('homePriceSlider').value;
+    const downPaymentPct = +document.getElementById('downPaymentSlider').value;
+    const rate15 = +document.getElementById('rate15Slider').value;
+    const rate30 = +document.getElementById('rate30Slider').value;
+    const roi = +document.getElementById('roiSlider').value;
+    const years = +document.getElementById('yearsSlider').value;
+    const totalBudget = +document.getElementById('budgetSlider').value;
+    const marginalTaxRate = +document.getElementById('taxRateSlider').value;
+    const capGainsRate = +document.getElementById('capGainsSlider').value;
+    const pmiRate = +document.getElementById('pmiRate').value;
+    const extra2 = +document.getElementById('extra2').value;
+    const countRemaining = document.getElementById('countRemainingBalance').checked;
+
+    const s1 = buildScenario1(homePrice, downPaymentPct, rate15, roi, years, totalBudget, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+    const s2 = buildScenario2(homePrice, downPaymentPct, rate30, roi, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+
+    // KPIs
+    const k1 = document.querySelector('#kpi1 .n');
+    const k2 = document.querySelector('#kpi2 .n');
+    
+    if(s1.error){
+      k1.textContent = 'Budget Exceeded';
+      k1.style.color = 'var(--bad)';
+    } else {
+      k1.textContent = `$${fmt(s1.net)}`;
+      k1.style.color = 'var(--ink)';
+    }
+    
+    if(s2.error){
+      k2.textContent = 'Budget Exceeded';
+      k2.style.color = 'var(--bad)';
+    } else {
+      k2.textContent = `$${fmt(s2.net)}`;
+      k2.style.color = 'var(--ink)';
+    }
+
+    const k1n = document.querySelector('#kpi1note');
+    const k2n = document.querySelector('#kpi2note');
+    
+    if(s1.error){
+      k1n.textContent = 'Increase budget or change loan terms';
+    } else {
+      const payoffYear = s1.payoffMonth ? Math.ceil(s1.payoffMonth/12) : years;
+      k1n.textContent = `Net after taxes & costs. Down: $${fmt(s1.downPayment)}`;
+    }
+    
+    if(s2.error){
+      k2n.textContent = 'Increase budget or reduce extra payments';
+    } else {
+      const payoffYear = s2.payoffMonth ? Math.ceil(s2.payoffMonth/12) : years;
+      k2n.textContent = `Net after taxes & costs. Down: $${fmt(s2.downPayment)}`;
+    }
+
+    // Winner banner and break-even analysis
+    const winner = document.getElementById('winner');
+    const breakevenContent = document.getElementById('breakevenContent');
+    const s1card = document.getElementById('s1card');
+    const s2card = document.getElementById('s2card');
+    s1card.classList.remove('winner','loser');
+    s2card.classList.remove('winner','loser');
+
+    if(s1.error || s2.error){
+      winner.innerHTML = 'Adjust budget or loan parameters to enable comparison.';
+      breakevenContent.innerHTML = 'Fix budget issues first.';
+    } else {
+      const better = s1.net===s2.net ? 'Tie' : (s1.net > s2.net ? '15-year loan strategy' : '30-year loan strategy');
+      const diff = Math.abs(s1.net - s2.net);
+      winner.innerHTML = better==='Tie' ? 'Tie on net outcome.' : `${better} is ahead by <b>$${fmt(diff)}</b> over ${years} years.`;
+      
+      // Calculate break-even
+      const breakEvenROI = calculateBreakEven(homePrice, downPaymentPct, rate15, rate30, years, totalBudget, extra2, pmiRate, marginalTaxRate, capGainsRate, countRemaining);
+      const currentROI = roi;
+      
+      if(breakEvenROI === null) {
+        // No break-even point found
+        const favoredStrategy = s1.net > s2.net ? '15-year loan' : '30-year loan';
+        breakevenContent.innerHTML = `
+          <div><strong>${favoredStrategy} strategy dominates</strong></div>
+          <div>No break-even point found in 0-30% return range</div>
+          <div style="margin-top: 5px; font-size: 11px;">
+            The ${favoredStrategy} strategy is better across all reasonable investment return assumptions.
+          </div>
+        `;
+      } else {
+        breakevenContent.innerHTML = `
+          <div>Break-even investment return: <strong>${breakEvenROI.toFixed(2)}%</strong></div>
+          <div>Current assumption: ${currentROI}%</div>
+          <div style="margin-top: 8px; font-size: 11px;">
+            <strong>What this means:</strong><br>
+            • If you expect investment returns <strong>above ${breakEvenROI.toFixed(1)}%</strong> → Choose 30-year loan + invest<br>
+            • If you expect investment returns <strong>below ${breakEvenROI.toFixed(1)}%</strong> → Choose 15-year loan<br>
+            • At exactly ${breakEvenROI.toFixed(1)}%, both strategies yield the same result
+          </div>
+          <div style="margin-top: 5px; font-size: 11px; color: ${currentROI > breakEvenROI ? 'var(--good)' : currentROI < breakEvenROI ? 'var(--accent)' : 'var(--muted)'}">
+            ${currentROI > breakEvenROI ? 
+              '✓ 30-year + invest strategy favored at your return assumption' : 
+              currentROI < breakEvenROI ? 
+              '✓ 15-year loan strategy favored at your return assumption' :
+              '= Strategies are approximately equal at your return assumption'
+            }
+          </div>
+        `;
+      }
+      
+      // Color cards
+      if (s1.net > s2.net){ s1card.classList.add('winner'); s2card.classList.add('loser'); }
+      else if (s2.net > s1.net){ s2card.classList.add('winner'); s1card.classList.add('loser'); }
+    }
+
+    // Render details
+    renderScenario(document.getElementById('s1'), s1);
+    renderScenario(document.getElementById('s2'), s2);
+  }
+
+  document.getElementById('run').addEventListener('click', run);
+  document.getElementById('dumpCsv').addEventListener('click', ()=>{
+    // CSV export function would go here - simplified for now
+    alert('CSV export feature - implementation details would use the same parameters as run()');
+  });
+
+  // Initialize sliders and run once on load
+  setupSliders();
+  run();
+</script>
+</body>
+</html>
